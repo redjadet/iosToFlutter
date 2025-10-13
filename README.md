@@ -20,3 +20,8 @@ This repository hosts a small reference application implemented twice to compare
 - The Flutter project uses Material 3 theming but mirrors SwiftUI layouts and copy for accurate comparisons.
 - Keep any new assets in the Flutter app’s `assets/` folder and register them inside `pubspec.yaml`.
 - When updating features, reflect changes in both implementations so the comparison stays relevant.
+
+## Comparison Takeaways
+- Day-to-day edits are easier to automate and review in the Flutter (Cupertino-styled) project thanks to its explicit widget trees and consolidated entry point.
+- For long-term maintenance, SwiftUI stays nimble for iOS-only scope, while Flutter scales better when you need shared releases across platforms.
+- Expect slightly higher regression risk in SwiftUI because of implicit environment/state propagation; Flutter’s explicit props and state make changes more predictable.
