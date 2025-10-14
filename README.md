@@ -55,6 +55,19 @@ From a readability and authoring perspective:
 - **Jetpack Compose** strikes a balance: Kotlin syntax is explicit, composable functions read top-to-bottom, and `remember` state declarations live near the UI that consumes them. It still requires you to track multiple lambdas and experimental APIs, but the intent is usually clear.
 - **Flutter** is the most verbose—nested widgets and constructors can stretch over many lines—but everything is spelled out. Named parameters, immutable widgets, and explicit `State` classes make the code predictable, and once you’re comfortable with the widget tree pattern, it’s easy to scan. Tight integration with `flutter test`, golden comparison tools, and widget testing frameworks mean UI logic is easy to validate without firing up emulators. For me, that explicit structure and tooling make Flutter the easiest to reason about and maintain across platforms.
 
+## Flutter vs. React Native
+
+Although the repository does not include a React Native build, evaluating a hypothetical port helps explain why Flutter remains the better fit for this project.
+
+- **Project layout**: Flutter keeps Dart source, assets, and platform runners inside one workspace. React Native would split JavaScript/TypeScript from native shells and require additional bridge code in Swift/Objective-C and Kotlin/Java.
+- **Rendering fidelity**: Flutter’s Skia renderer and existing Material 3 theming ensure identical visuals across iOS and Android. React Native maps to host controls, so matching the current UI would demand platform-specific styling and testing.
+- **State & navigation**: Flutter relies on strongly typed Dart patterns and first-party navigation APIs. React Native typically layers Redux/MobX and React Navigation, increasing dependency surface area and mixing paradigms.
+- **Performance profile**: Flutter compiles to native ARM code and keeps platform-channel crossings narrow. React Native’s JavaScript bridge introduces latency for animation-heavy screens such as gradients, physics demos, and long lists.
+- **Tooling orchestration**: Flutter centralizes analysis, formatting, testing, and hot reload in a single CLI. React Native development juggles Metro Bundler, npm/yarn scripts, Jest, ESLint, and still the native build systems.
+- **Platform reach**: Flutter extends the same code to web and desktop with minimal changes. React Native would require complementary stacks (React Native Web, Windows, macOS) that drift from the mobile implementation.
+
+Overall, Flutter lets the team deliver these samples with less duplicate work, tighter performance, and a simpler toolchain than a React Native rewrite could offer.
+
 ## Conclusion
 
 When keeping iOS and Android in sync with ongoing feature work, the Flutter codebase is the most efficient foundation. A single `lib/` tree powers both platforms, iterations stay predictable, and cross-platform tooling shortens feedback loops. Flutter’s hot reload/restart dramatically reduces turnaround time during UI polish, while its rendering stack is insulated from annual iOS/Android framework changes—meaning upgrades rarely break existing widgets. Beyond mobile, the same code can deploy to web, desktop, and embedded form factors, giving teams real freedom to ship where it matters without forking UI layers. Add in first-class packages, strong testing support, and identical business logic across every target, and Flutter minimizes maintenance overhead when parity across the entire stack is the priority. SwiftUI remains the best fit for iOS-only efforts and Jetpack Compose mirrors the UI well on Android, but Flutter unifies the experience without sacrificing velocity or reach.
