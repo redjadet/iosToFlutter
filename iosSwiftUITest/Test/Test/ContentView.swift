@@ -7,7 +7,7 @@ struct ContentView: View {
         NavigationStack {
             List {
                 Section(LocalizedStringKey("Try a Sample")) {
-                    ForEach(Demo.allCases) { demo in
+                    ForEach(Demo.all) { demo in
                         NavigationLink(value: demo) {
                             DemoRow(demo: demo)
                         }
@@ -45,74 +45,57 @@ struct ContentView: View {
     }
 }
 
-private enum Demo: String, CaseIterable, Identifiable {
-    case gradient
-    case controls
-    case animation
-    case list
-    case grid
+private struct Demo: Identifiable, Hashable {
+    let id: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
+    let icon: String
+    let destinationView: AnyView
 
-    var id: String { rawValue }
+    static let all: [Demo] = [
+        Demo(
+            id: "gradient",
+            title: LocalizedStringKey("Gradient Playground"),
+            subtitle: LocalizedStringKey("Animate colors and tweak gradients."),
+            icon: "paintpalette",
+            destinationView: AnyView(GradientPlayground())
+        ),
+        Demo(
+            id: "controls",
+            title: LocalizedStringKey("Forms and Controls"),
+            subtitle: LocalizedStringKey("Build a form with common controls."),
+            icon: "slider.horizontal.3",
+            destinationView: AnyView(FormPlayground())
+        ),
+        Demo(
+            id: "animation",
+            title: LocalizedStringKey("Animations"),
+            subtitle: LocalizedStringKey("Play with smooth transitions."),
+            icon: "sparkles",
+            destinationView: AnyView(AnimationPlayground())
+        ),
+        Demo(
+            id: "list",
+            title: LocalizedStringKey("Dynamic Lists"),
+            subtitle: LocalizedStringKey("Organize data with sections."),
+            icon: "list.bullet.rectangle",
+            destinationView: AnyView(TaskListPlayground())
+        ),
+        Demo(
+            id: "grid",
+            title: LocalizedStringKey("Adaptive Grid"),
+            subtitle: LocalizedStringKey("Lay out cards with LazyVGrid."),
+            icon: "square.grid.2x2",
+            destinationView: AnyView(GridPlayground())
+        )
+    ]
 
-    var title: LocalizedStringKey {
-        switch self {
-        case .gradient:
-            return LocalizedStringKey("Gradient Playground")
-        case .controls:
-            return LocalizedStringKey("Forms and Controls")
-        case .animation:
-            return LocalizedStringKey("Animations")
-        case .list:
-            return LocalizedStringKey("Dynamic Lists")
-        case .grid:
-            return LocalizedStringKey("Adaptive Grid")
-        }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
-    var subtitle: LocalizedStringKey {
-        switch self {
-        case .gradient:
-            return LocalizedStringKey("Animate colors and tweak gradients.")
-        case .controls:
-            return LocalizedStringKey("Build a form with common controls.")
-        case .animation:
-            return LocalizedStringKey("Play with smooth transitions.")
-        case .list:
-            return LocalizedStringKey("Organize data with sections.")
-        case .grid:
-            return LocalizedStringKey("Lay out cards with LazyVGrid.")
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .gradient:
-            return "paintpalette"
-        case .controls:
-            return "slider.horizontal.3"
-        case .animation:
-            return "sparkles"
-        case .list:
-            return "list.bullet.rectangle"
-        case .grid:
-            return "square.grid.2x2"
-        }
-    }
-
-    @ViewBuilder
-    var destinationView: some View {
-        switch self {
-        case .gradient:
-            GradientPlayground()
-        case .controls:
-            FormPlayground()
-        case .animation:
-            AnimationPlayground()
-        case .list:
-            TaskListPlayground()
-        case .grid:
-            GridPlayground()
-        }
+    static func == (lhs: Demo, rhs: Demo) -> Bool {
+        lhs.id == rhs.id
     }
 }
 
@@ -148,19 +131,47 @@ private struct DemoRow: View {
     }
 }
 
+private struct TipSectionData: Identifiable {
+    let id = UUID()
+    let title: LocalizedStringKey
+    let items: [TipItem]
+}
+
+private struct TipItem: Identifiable {
+    let id = UUID()
+    let text: LocalizedStringKey
+    let icon: String
+}
+
+private let tipSections: [TipSectionData] = [
+    TipSectionData(
+        title: LocalizedStringKey("Previews"),
+        items: [
+            TipItem(text: LocalizedStringKey("Use the resume button to refresh a preview quickly."), icon: "play.circle"),
+            TipItem(text: LocalizedStringKey("Switch devices from the Preview canvas toolbar."), icon: "iphone")
+        ]
+    ),
+    TipSectionData(
+        title: LocalizedStringKey("Layout"),
+        items: [
+            TipItem(text: LocalizedStringKey("Stacks and spacers are the backbone of most layouts."), icon: "square.split.2x2"),
+            TipItem(text: LocalizedStringKey("ContainerRelativeFrame helps with scrollable hero sections."), icon: "rectangle.expand.vertical")
+        ]
+    )
+]
+
 private struct TipsSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
-                Section(LocalizedStringKey("Previews")) {
-                    Label(LocalizedStringKey("Use the resume button to refresh a preview quickly."), systemImage: "play.circle")
-                    Label(LocalizedStringKey("Switch devices from the Preview canvas toolbar."), systemImage: "iphone")
-                }
-                Section(LocalizedStringKey("Layout")) {
-                    Label(LocalizedStringKey("Stacks and spacers are the backbone of most layouts."), systemImage: "square.split.2x2")
-                    Label(LocalizedStringKey("ContainerRelativeFrame helps with scrollable hero sections."), systemImage: "rectangle.expand.vertical")
+                ForEach(tipSections) { section in
+                    Section(section.title) {
+                        ForEach(section.items) { item in
+                            Label(item.text, systemImage: item.icon)
+                        }
+                    }
                 }
             }
             .navigationTitle(LocalizedStringKey("SwiftUI Tips"))
